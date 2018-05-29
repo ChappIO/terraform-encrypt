@@ -1,0 +1,8 @@
+### IntelliJ
+.idea/
+*.iml
+
+### Build
+terraform-encrypt
+*.txt
+build/
