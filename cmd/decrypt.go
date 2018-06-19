@@ -49,11 +49,15 @@ func decryptFile(sourceFile string, password string) {
 		targetFile = sourceFile
 	}
 
-	file, err := os.Create(targetFile)
-	if err != nil {
-		fmt.Printf("Failed to write to '%s': %s\n", sourceFile, err.Error())
-		os.Exit(1)
+	if targetFile == "-" {
+		fmt.Println(string(message.PlainText))
+	} else {
+		file, err := os.Create(targetFile)
+		if err != nil {
+			fmt.Printf("Failed to write to '%s': %s\n", sourceFile, err.Error())
+			os.Exit(1)
+		}
+		defer file.Close()
+		file.Write(message.PlainText)
 	}
-	defer file.Close()
-	file.Write(message.PlainText)
 }

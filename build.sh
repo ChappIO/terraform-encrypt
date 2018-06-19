@@ -12,9 +12,7 @@ do
             OUTPUT="${OUTPUT}.exe"
         fi
 
-        export GOARCH
-        export CGO_ENABLED
-        export GOOS
+        go get
         echo "Building ${OUTPUT}..."
         go build -o ${OUTPUT} main.go
     done
