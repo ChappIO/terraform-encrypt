@@ -5,39 +5,66 @@ A simple encrypt program to be used by terraform's external data provider
 
 There are several commands which you can invoke on terraform-encrypt.
 
+### Command: encrypt
+
+To encrypt a file in-place (or to another file) you run:
+
+```bash
+terraform-encrypt encrypt [sourceFiles...] [flags]
+```
+
+Flags:
+ - `-o`, `--output string`:     The target file location. Can only be used if a single file is passed. Specify '-' to output to stdout.
+ - `-p`, `--password string`:   The vault password. This defaults to the value of environment variable `VAULT_PASSWORD`.
+
+### Command: decrypt
+
+To decrypt a file you run:
+
+```bash
+terraform-encrypt decrypt [sourceFiles...] [flags]
+```
+
+Flags:
+ - `-o`, `--output string`:     The target file location. Can only be used if a single file is passed. Specify '-' to output to stdout.
+ - `-p`, `--password string`:   The vault password. This defaults to the value of environment variable `VAULT_PASSWORD`.
+
+
 ### Using Terraform
+
+Create a json file:
+
+
+```json
+{
+    "fieldA": "Value",
+    "message": "I am super secret!"
+}
+```
+
+Encrypt the file:
+
+```bash
+terraform-encrypt encrypt secret.json
+```
+
+Read using terraform:
 
 ````hcl
 
 data "external" "secret" {
   program = [
-    "terraform-encrypt"
+    "terraform-encrypt",
+    "decrypt",
+    "${path.module}/path/to/encrypted/file",
+    "--output",
+    "-"
   ]
-  
-  query = {
-    vault_key = "My Secret Key... 123"
-    src_file = "${path.root}/path/to/file.json"
-  }
 }
 
 output "result" {
-  value = "${data.external.ansible.result.message}"
+  value = "${data.external.secret.result.message}"
 }
 
 ````
 
-### Command: terraform-encrypt encrypt
-
-To encypt a file in-place (or to another file) you run:
-
-```bash
-terraform-encrypt encrypt <source-file>
-```
-
-Options:
-
-- `-o <target-file>`: Store the encypted version of the source file in a different place
-
-### Command: terraform-encrypt decrypt
-
-### Command: terraform-encrypt job

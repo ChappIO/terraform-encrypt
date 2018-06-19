@@ -12,8 +12,8 @@ import (
 func init() {
 	for _, cmd := range []*cobra.Command{encryptCmd, decryptCmd} {
 		rootCmd.AddCommand(cmd)
-		cmd.Flags().StringVarP(&outputFile, "output", "o", "", "The target file location. Can only be used if a single file is passed.")
-		cmd.Flags().StringVarP(&vaultPassword, "password", "p", "", "The vault password")
+		cmd.Flags().StringVarP(&outputFile, "output", "o", "", "The target file location. Can only be used if a single file is passed. Specify '-' to output to stdout.")
+		cmd.Flags().StringVarP(&vaultPassword, "password", "p", "", "The vault password. This defaults to the value of environment variable `VAULT_PASSWORD`.")
 	}
 }
 
