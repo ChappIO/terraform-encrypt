@@ -33,7 +33,7 @@ func encryptFile(sourceFile string, password string) {
 		PlainText: plaintext,
 	}
 	message.Encrypt(password)
-	base64String := base64.StdEncoding.EncodeToString(message.CipherText)
+	base64String := wrapString(base64.StdEncoding.EncodeToString(message.CipherText), 80)
 
 	targetFile := outputFile
 
@@ -41,25 +41,34 @@ func encryptFile(sourceFile string, password string) {
 		targetFile = sourceFile
 	}
 
-	file, err := os.Create(targetFile)
-	if err != nil {
-		fmt.Printf("Failed to write to '%s': %s", sourceFile, err.Error())
-		os.Exit(1)
+	if targetFile == "-" {
+		fmt.Println(base64String);
+	} else {
+		file, err := os.Create(targetFile)
+		if err != nil {
+			fmt.Printf("Failed to write to '%s': %s", sourceFile, err.Error())
+			os.Exit(1)
+		}
+		defer file.Close()
+		file.WriteString(base64String);
 	}
-	defer file.Close()
+}
 
+func wrapString(input string, width int) string {
+	wrappedString := "";
 	// Write the base64 string in chunks
 	written := 0
-	for written < len(base64String) {
+	for written < len(input) {
 		start := written
-		end := start + 80
-		if end >= len(base64String) {
-			end = len(base64String)
+		end := start + width
+		if end >= len(input) {
+			end = len(input)
 		}
 
-		str := base64String[start:end]
-		file.WriteString(str)
-		file.WriteString("\n")
+		str := input[start:end]
+		wrappedString = wrappedString + str + "\n";
 		written += end - start
 	}
+
+	return wrappedString;
 }
