@@ -1,6 +1,6 @@
 # terraform-encrypt
 
-A simple encrypt program to be used by terraform's external data provider or as a simple CLI tool.
+A simple encrypt program to be used by terraform's external data provider or as a CLI tool.
 
 ## Usage
 
