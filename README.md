@@ -50,7 +50,7 @@ terraform-encrypt encrypt secret.json
 
 Read using terraform:
 
-````hcl
+```hcl
 data "external" "secret" {
   program = [
     "terraform-encrypt",
@@ -64,4 +64,4 @@ data "external" "secret" {
 output "result" {
   value = "${data.external.secret.result.message}"
 }
-````
+```
