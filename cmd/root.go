@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"fmt"
-	"os"
 	"errors"
+	"fmt"
+	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
+	"os"
 	"syscall"
 )
 
@@ -14,11 +14,13 @@ func init() {
 		rootCmd.AddCommand(cmd)
 		cmd.Flags().StringVarP(&outputFile, "output", "o", "", "The target file location. Can only be used if a single file is passed. Specify '-' to output to stdout.")
 		cmd.Flags().StringVarP(&vaultPassword, "password", "p", "", "The vault password. This defaults to the value of environment variable `VAULT_PASSWORD`.")
+		cmd.Flags().BoolVarP(&confirmPassword, "confirm-password", "c", false, "Confirm the vault password when prompting.")
 	}
 }
 
 var outputFile = ""
 var vaultPassword = ""
+var confirmPassword = false
 
 var rootCmd = &cobra.Command{
 	Use:   "terraform-encrypt",
@@ -32,7 +34,7 @@ func Execute() {
 	}
 }
 
-func requireOneInputFile(cmd *cobra.Command, args []string) error {
+func requireOneInputFile(_ *cobra.Command, args []string) error {
 	if outputFile != "" {
 		if len(args) == 0 {
 			return errors.New("provide one input file")
@@ -62,13 +64,25 @@ func findPassword() string {
 
 	// 3. Prompt
 	for result == "" {
-		fmt.Print("Vault Password: ")
-		passwd, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			panic(err)
+		prompted := promptPassword("Vault Password")
+
+		// Confirm Password
+		if confirmPassword && prompted != promptPassword("Confirm Password") {
+			fmt.Println("Passwords do not match, please try again.")
+			continue
 		}
-		result = string(passwd)
-		fmt.Println()
+
+		result = prompted
 	}
 	return result
+}
+
+func promptPassword(prompt string) string {
+	fmt.Print(prompt + ": ")
+	password, err := terminal.ReadPassword(syscall.Stdin)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println()
+	return string(password)
 }

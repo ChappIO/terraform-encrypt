@@ -1,5 +1,6 @@
 # terraform-encrypt
-A simple encrypt program to be used by terraform's external data provider
+
+A simple encrypt program to be used by terraform's external data provider or as a CLI tool.
 
 ## Usage
 
@@ -26,14 +27,13 @@ terraform-encrypt decrypt [sourceFiles...] [flags]
 ```
 
 Flags:
+ - `-c`, `--confirm-password`:  Confirm the vault password when prompting.
  - `-o`, `--output string`:     The target file location. Can only be used if a single file is passed. Specify '-' to output to stdout.
  - `-p`, `--password string`:   The vault password. This defaults to the value of environment variable `VAULT_PASSWORD`.
-
 
 ### Using Terraform
 
 Create a json file:
-
 
 ```json
 {
@@ -50,8 +50,7 @@ terraform-encrypt encrypt secret.json
 
 Read using terraform:
 
-````hcl
-
+```hcl
 data "external" "secret" {
   program = [
     "terraform-encrypt",
@@ -65,6 +64,4 @@ data "external" "secret" {
 output "result" {
   value = "${data.external.secret.result.message}"
 }
-
-````
-
+```
